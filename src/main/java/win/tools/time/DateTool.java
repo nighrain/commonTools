@@ -45,13 +45,18 @@ import java.util.Date;
  * 参数含义参考：https://blog.csdn.net/beauty9235/article/details/2033133
  * </p>
  */
-public class DateUtil {
-    public static final String DEFAULT_ALL_YMD_HMS = "yyyy-MM-dd HH:mm:ss";
-    public static final String DEFAULT_SIMPLE_YMD = "yyyy-MM-dd";
+public class DateTool {
+    //   Hyphen -   slash /
+    public static final String PATTERN_HYPHEN_YMD_HMS = "yyyy-MM-dd HH:mm:ss";
+    public static final String PATTERN_HYPHEN_YMD = "yyyy-MM-dd";
+    public static final String PATTERN_SLASH_YMD_HMS = "yyyy/MM/dd HH:mm:ss";
+    public static final String PATTERN_SLASH_YMD = "yyyy/MM/dd";
+    public static final String PATTERN_NUM_YMD_HMS = "yyyyMMddHHmmss";
+    public static final String PATTERN_NUM_YMD = "yyyyMMdd";
 
     private static Calendar calendar = Calendar.getInstance();
 
-    private DateUtil() {
+    private DateTool() {
     }
 
     /**
@@ -59,7 +64,7 @@ public class DateUtil {
      * @return 使用默认格式(y - M - d H : m : s), 格式化输入日期
      */
     public static String format(Date date) {
-        return format(date, DEFAULT_ALL_YMD_HMS);
+        return format(date, PATTERN_HYPHEN_YMD_HMS);
     }
 
     /**
@@ -70,7 +75,7 @@ public class DateUtil {
     public static String format(Date date, String pattern) {
         String pattern_ = pattern;
         if (pattern_ == null || "".equals(pattern_.trim())) {
-            pattern_ = DEFAULT_ALL_YMD_HMS;
+            pattern_ = PATTERN_HYPHEN_YMD_HMS;
         }
         if (date == null) {
             return null;
@@ -86,7 +91,7 @@ public class DateUtil {
     public static String formatNow(String pattern) {
         String pattern_ = pattern;
         if (pattern_ == null || "".equals(pattern_.trim())) {
-            pattern_ = DEFAULT_ALL_YMD_HMS;
+            pattern_ = PATTERN_HYPHEN_YMD_HMS;
         }
         return format(new Date(), pattern_);
     }
@@ -100,7 +105,7 @@ public class DateUtil {
         try {
             String pattern_ = pattern;
             if (pattern_ == null) {
-                pattern_ = DEFAULT_ALL_YMD_HMS;
+                pattern_ = PATTERN_HYPHEN_YMD_HMS;
             }
             SimpleDateFormat sdf = new SimpleDateFormat(pattern_);
             Date date = sdf.parse(dateStr);
@@ -133,8 +138,8 @@ public class DateUtil {
         Date date_ = date;
         calendar.setTime(date_);
         calendar.add(Calendar.YEAR, years_);
-        String format = format(calendar.getTime(), DEFAULT_SIMPLE_YMD);
-        return parse(format, DEFAULT_SIMPLE_YMD);
+        String format = format(calendar.getTime(), PATTERN_HYPHEN_YMD);
+        return parse(format, PATTERN_HYPHEN_YMD);
     }
 
     /**
@@ -248,6 +253,61 @@ public class DateUtil {
         return endDate.getTime() - beginDate.getTime();
     }
 
+    /**
+     * @param date 指定日期
+     * @return 指定日期的最小时间值
+     */
+    public static Date getMinTimeInDay(Date date){
+        return parse(format(date, PATTERN_HYPHEN_YMD), PATTERN_HYPHEN_YMD);
+    }
+
+    /**
+     * @param date 指定日期
+     * @return 指定日期的最大时间值
+     */
+    public static Date getMaxTimeInDay(Date date){
+        if(date == null){
+            return null;
+        }
+        Date date_ = date;
+        calendar.setTime(date_);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date_ = getMinTimeInDay(calendar.getTime());
+        calendar.setTime(date_);
+        calendar.add(Calendar.SECOND, -1);
+        return calendar.getTime();
+    }
+
+    /**
+     * @param date 指定日期
+     * @return 某月的第一天
+     */
+    public static Date getFirstDayByMonth(Date date){
+        if(date == null){
+            return null;
+        }
+        Date date_ = date;
+        date_ = parse(format(date_, PATTERN_HYPHEN_YMD),PATTERN_HYPHEN_YMD );
+        calendar.setTime(date_);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        return calendar.getTime();
+    }
+
+    /**
+     * @param date 指定日期
+     * @return 某月的最后一天
+     */
+    public static Date getLastDayByMonth(Date date) {
+        if (date == null) {
+            return null;
+        }
+        Date date_ = date;
+        date_ = parse(format(date_, PATTERN_HYPHEN_YMD),PATTERN_HYPHEN_YMD );
+        calendar.setTime(date_);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return calendar.getTime();
+    }
+
     private static Date removeNull(Date date) {
         Date date_ = date;
         if (date_ == null) {
@@ -263,22 +323,40 @@ public class DateUtil {
 //        System.out.println(formatNow("yyMMdd"));
 
         System.out.println(format(addDaysThatDate(date, 2)));
-//        System.out.println(format(addDaysThatDate(date,-1),DEFAULT_SIMPLE_YMD) + "===" + format(addDaysThatDate(date,-1),DEFAULT_SIMPLE_YMD));
+//        System.out.println(format(addDaysThatDate(date,-1),PATTERN_HYPHEN_YMD) + "===" + format(addDaysThatDate(date,-1),PATTERN_HYPHEN_YMD));
 //        for (int i = -500; i < 0; i++) {
-//            System.out.println(format(addDaysThatDate(date,i),DEFAULT_SIMPLE_YMD) + "===" + format(addDaysThatDate(date,i),DEFAULT_SIMPLE_YMD));
+//            System.out.println(format(addDaysThatDate(date,i),PATTERN_HYPHEN_YMD) + "===" + format(addDaysThatDate(date,i),PATTERN_HYPHEN_YMD));
 //        }
 
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_ALL_YMD_HMS);
-        String thatDateStr = "2019-01-01 13:01:00";
-        String beginDateStr = "2019-01-01 13:00:00";
-        String endDateStr = "2019-01-01 14:00:00";
-        Date thatDate = sdf.parse(thatDateStr);
-        Date beginDate = sdf.parse(beginDateStr);
-        Date endDate = sdf.parse(endDateStr);
-        System.out.println(isInDateRange(thatDate, null, endDate));
-        System.out.println(isInDateRange(thatDate, beginDate, null));
-        System.out.println(isInDateRange(thatDate, beginDate, endDate));
-        System.out.println(format(getThatDateStart(new Date())));
+//        SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_HYPHEN_YMD_HMS);
+//        String thatDateStr = "2019-01-01 13:01:00";
+//        String beginDateStr = "2019-01-01 13:00:00";
+//        String endDateStr = "2019-01-01 14:00:00";
+//        Date thatDate = sdf.parse(thatDateStr);
+//        Date beginDate = sdf.parse(beginDateStr);
+//        Date endDate = sdf.parse(endDateStr);
+//        System.out.println(isInDateRange(thatDate, null, endDate));
+//        System.out.println(isInDateRange(thatDate, beginDate, null));
+//        System.out.println(isInDateRange(thatDate, beginDate, endDate));
+//        System.out.println(format(getThatDateStart(new Date())));
+
+//        System.out.println(format(getMinTimeInDay(new Date())));
+//        System.out.println(format(getMaxTimeInDay(new Date())));
+//        System.out.println(format(getFirstDayByMonth(new Date())));
+//
+//        Date parse = parse("2012-02-03 11:12:02", PATTERN_HYPHEN_YMD_HMS);
+//        System.out.println(format(getLastDayByMonth(parse)));
+//        System.out.println(format(getLastDayByMonth(new Date())));
+//        System.out.println(new Date().toString());
+
+        System.out.println("-----------------");
+        System.out.println(format(date, PATTERN_HYPHEN_YMD_HMS));
+        System.out.println(format(date, PATTERN_HYPHEN_YMD));
+        System.out.println(format(date, PATTERN_SLASH_YMD_HMS));
+        System.out.println(format(date, PATTERN_SLASH_YMD));
+        System.out.println(format(date, PATTERN_NUM_YMD_HMS));
+        System.out.println(format(date, PATTERN_NUM_YMD));
+
     }
 
 }
