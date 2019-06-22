@@ -45,7 +45,7 @@ import java.util.Date;
  * 参数含义参考：https://blog.csdn.net/beauty9235/article/details/2033133
  * </p>
  */
-public class DateTool {
+public class DateTools {
     //   Hyphen -   slash /
     public static final String PATTERN_HYPHEN_YMD_HMS = "yyyy-MM-dd HH:mm:ss";
     public static final String PATTERN_HYPHEN_YMD = "yyyy-MM-dd";
@@ -56,7 +56,7 @@ public class DateTool {
 
     private static Calendar calendar = Calendar.getInstance();
 
-    private DateTool() {
+    private DateTools() {
     }
 
     /**
