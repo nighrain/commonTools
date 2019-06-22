@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 /**
  *    
- * Title         [title]
- * Author:       [..]
+ * Title         [常用字符串工具类]
+ * Author:       [nighrain]
  * CreateDate:   [2019-06-18--15:16]  @_@ ~~
  * Version:      [v1.0]
  * Description:  [..]
