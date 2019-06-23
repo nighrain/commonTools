@@ -14,10 +14,15 @@ import java.nio.charset.Charset;
  * Version:      [v1.0]
  * Description:  [..]
  * <p></p>
+ * 遍历某文件夹下的所有文件(递归/非递归)
+ *
  *  
  */
 public class FileTools {
 
+    private FileTools() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
+    }
 
     /**
      * @param date 要输出的信息

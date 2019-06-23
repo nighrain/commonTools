@@ -39,6 +39,9 @@ public class GenerateTool {
     private static final String descriptionSize = "VARCHAR2(128)"; //reflexMode 描述类字段对应的字符串的大小
     private static final String[] markArr = {"desc","info","remark"};        //reflexMode 描述类字段对应的字段名的公有标识
 
+    private GenerateTool() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
+    }
 
     /**
      * <p>
@@ -61,13 +64,13 @@ public class GenerateTool {
      *             private String name 255;
      * </p>
      */
-    @Test
-    public void readFileMode() {
+//    @Test
+    public static void main(String[] a) {
         //读取文件的方式
         //解析文件
         StringBuffer stringBuffer = readFile("D:\\w-temp\\CREATE_SQL.txt");
         //将结果输出到文件
-        FileTools.output2File(stringBuffer, "D:\\.autoGetSet", "Demo3.txt");
+//        FileTools.output2File(stringBuffer, "D:\\.autoGetSet", "Demo3.txt");
     }
 
     /**
@@ -85,7 +88,7 @@ public class GenerateTool {
         //要解析的类
         Class<?> clazz = Demo.class;
 
-        StringBuffer stringBuffer = reflex(clazz, true);
+        StringBuffer stringBuffer = doReflex(clazz, true);
         //将结果输出到文件
         FileTools.output2File(stringBuffer,"D:\\.autoGetSet", clazz.getSimpleName() + ".txt");
     }
@@ -120,8 +123,9 @@ public class GenerateTool {
             //循环读取每一行
             while ((row = br.readLine()) != null) {
                 if ("".equals(row.trim())) continue;
-                row = row.replaceAll("\t", "").trim();
+                row = row.replaceAll("\\s+", " ").trim();
                 if ("".equals(row) || row.startsWith("//")) continue;
+//                System.out.println(row);
 
                 //把字符串 "private Long policyNo 256;"截取成 Long policyNo 256
                 /**
@@ -196,7 +200,7 @@ public class GenerateTool {
      *                                      false 则只解析没有get方法的字段,适用于修改表补充字段
      * @return 解析后的结果
      */
-    public static StringBuffer reflex(Class clazz, boolean isAllFieldMode) {
+    public static StringBuffer doReflex(Class clazz, boolean isAllFieldMode) {
         //获取注解上的表名
         Annotation annotation = clazz.getAnnotation(Table.class);
         String tableName = null;
@@ -208,7 +212,7 @@ public class GenerateTool {
         }
 
         int fieldAll = 0;       //全部字段
-        int fieldAnalysis = 0;  //已经解析的字段
+        int fieldAnalysis = 0;  //本次处理的字段
         int fieldExisting = 0;    //已存在get方法的字段
         int fieldIgnore = 0;    //忽略的字段
         int fieldSpecial = 0;    //需要手动处理的特殊字段
@@ -254,6 +258,7 @@ public class GenerateTool {
 //            System.out.println(type.getSimpleName());
 //            System.out.println(field.getName());
 //            System.out.println("=============");
+            if (field.toGenericString().contains("static")) continue;
             if (existing.contains("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1))) {
                 fieldExisting += 1;
                 //已存在该get方法 并且是追加模式则 continue
@@ -284,7 +289,7 @@ public class GenerateTool {
                 .append("---模式: \t\t\t" + (isAllFieldMode ? "全字段模式" : "追加字段模式") + "\r\n")
                 .append("---需要手动处理的特殊字段: " + fieldSpecial + " 个" + "\r\n")
                 .append("---全部字段: \t\t" + fieldAll + " 个" + "\r\n")
-                .append("---已经解析的字段: \t" + fieldAnalysis + " 个" + "\r\n")
+                .append("---本次处理的字段: \t" + fieldAnalysis + " 个" + "\r\n")
                 .append("---忽略的字段: \t\t" + fieldIgnore + " 个" + "\r\n")
                 .append("---已存在get方法的字段: " + fieldExisting + " 个" + "\r\n");
         sbInfo.append("==============================");
@@ -378,7 +383,7 @@ public class GenerateTool {
      * @param separator 分隔符 一般填写空格 " "
      * @return 包含四个字段的 Map
      */
-    public static Map<String, String> parseStr2Mapper(String str, String separator) {
+    private static Map<String, String> parseStr2Mapper(String str, String separator) {
         HashMap<String, String> result = new HashMap<String, String>();
         String str_ = str;
         String[] rows = str_.split(separator);

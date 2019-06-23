@@ -34,20 +34,63 @@ import java.util.Map;
  */
 public class AutoGenerateTool {
 
-    private static final String enumSize = "VARCHAR2(32)";         //枚举对应的字符串的大小
-    private static final String stringSize = "VARCHAR2(64)";       //String对应的字符串的大小
-    private static final String descriptionSize = "VARCHAR2(128)"; //描述类字段对应的字符串的大小
-    private static final String[] markArr = {"desc","info","remark"};        //描述类字段对应的字段名的公有标识
-
     public static void main(String[] args) {
+        //输出文件夹
+        AutoGenerateTool.initPath("D:\\.autoGetSet");
+        //初始化 VARCHAR2 参数
+        AutoGenerateTool.init(32, 64, 128);
 
-        //要解析的类
-        Class<?> clazz = Demo.class;
-
-        StringBuffer stringBuffer = reflex(clazz, true);
-        //将结果输出到文件
-        output2File(stringBuffer,"D:\\.autoGetSet", clazz.getSimpleName() + ".txt");
+        /**
+         * @param clazz 要解析的类
+         * @param isAllFieldMode 是否全字段模式 true 则把该类的所有字段解析,适用于新建的表
+         *                                      false 则只解析没有get方法的字段,适用于修改表补充字段
+         */
+        AutoGenerateTool.reflexAndOutput(Demo.class, true);
     }
+
+    private static String parentPath = "D:\\.autoGetSet";    //输出文件夹
+    private static String enumSize = "VARCHAR2(32)";         //枚举对应的字符串的大小
+    private static String stringSize = "VARCHAR2(64)";       //String对应的字符串的大小
+    private static String descriptionSize = "VARCHAR2(128)"; //描述类字段对应的字符串的大小
+    private static String[] markArr = {"desc","info","remark"};        //描述类字段对应的字段名的公有标识
+
+
+    private AutoGenerateTool() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
+    //初始化 输出文件夹
+    public static void initPath(String parentPath){
+        AutoGenerateTool.parentPath = parentPath;
+    }
+    //初始化自定义参数,非必须
+    public static void init(int enumSize,int stringSize,int descriptionSize,String[] markArr){
+        if(enumSize<1 ||enumSize>255 ||stringSize<1||stringSize>255 ||descriptionSize<1||descriptionSize>255) throw new RuntimeException("必须在1~255之间");
+        AutoGenerateTool.enumSize = "VARCHAR2("+enumSize+")";
+        AutoGenerateTool.stringSize = "VARCHAR2("+stringSize+")";
+        AutoGenerateTool.descriptionSize = "VARCHAR2("+descriptionSize+")";
+        AutoGenerateTool.markArr = markArr;
+    }
+    public static void init(int enumSize,int stringSize,int descriptionSize){
+        if(enumSize<1 ||enumSize>255 ||stringSize<1||stringSize>255 ||descriptionSize<1||descriptionSize>255) throw new RuntimeException("必须在1~255之间");
+        AutoGenerateTool.enumSize = "VARCHAR2("+enumSize+")";
+        AutoGenerateTool.stringSize = "VARCHAR2("+stringSize+")";
+        AutoGenerateTool.descriptionSize = "VARCHAR2("+descriptionSize+")";
+    }
+    public static void init(String[] markArr){
+        AutoGenerateTool.markArr = markArr;
+    }
+
+    //包装一下方便调取
+    public static String reflexAndOutput(Class<?> clazz, boolean isAllFieldMode){
+
+        //解析
+        StringBuffer stringBuffer = doReflex(clazz, isAllFieldMode);
+        //将结果输出到文件
+        output2File(stringBuffer, parentPath, clazz.getSimpleName() + ".txt");
+        return stringBuffer.toString();
+    }
+
 
     /**
      * <p>
@@ -59,7 +102,7 @@ public class AutoGenerateTool {
      *                                      false 则只解析没有get方法的字段,适用于修改表补充字段
      * @return 解析后的结果
      */
-    public static StringBuffer reflex(Class clazz, boolean isAllFieldMode) {
+    public static StringBuffer doReflex(Class clazz, boolean isAllFieldMode) {
         //获取注解上的表名
         Annotation annotation = clazz.getAnnotation(Table.class);
         String tableName = null;
@@ -71,7 +114,7 @@ public class AutoGenerateTool {
         }
 
         int fieldAll = 0;       //全部字段
-        int fieldAnalysis = 0;  //已经解析的字段
+        int fieldAnalysis = 0;  //本次处理的字段
         int fieldExisting = 0;    //已存在get方法的字段
         int fieldIgnore = 0;    //忽略的字段
         int fieldSpecial = 0;    //需要手动处理的特殊字段
@@ -110,6 +153,7 @@ public class AutoGenerateTool {
         Field[] fields = clazz.getDeclaredFields();
         fieldAll = fields.length;
         for (Field field : fields) {
+            if (field.toGenericString().contains("static")) continue;
             if (existing.contains("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1))) {
                 fieldExisting += 1;
                 //已存在该get方法 并且是追加模式则 continue
@@ -140,7 +184,7 @@ public class AutoGenerateTool {
                 .append("---模式: \t\t\t" + (isAllFieldMode ? "全字段模式" : "追加字段模式") + "\r\n")
                 .append("---需要手动处理的特殊字段: " + fieldSpecial + " 个" + "\r\n")
                 .append("---全部字段: \t\t" + fieldAll + " 个" + "\r\n")
-                .append("---已经解析的字段: \t" + fieldAnalysis + " 个" + "\r\n")
+                .append("---本次处理的字段: \t" + fieldAnalysis + " 个" + "\r\n")
                 .append("---忽略的字段: \t\t" + fieldIgnore + " 个" + "\r\n")
                 .append("---已存在get方法的字段: " + fieldExisting + " 个" + "\r\n");
         sbInfo.append("==============================");

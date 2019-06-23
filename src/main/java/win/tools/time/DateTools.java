@@ -57,6 +57,7 @@ public class DateTools {
     private static Calendar calendar = Calendar.getInstance();
 
     private DateTools() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
     /**
@@ -219,6 +220,19 @@ public class DateTools {
         return true;
     }
 
+    /**
+     * @param beginDate 开始日期
+     * @param endDate 结束日期
+     * @return 开始日期 比 结束日期 早的年数
+     */
+    public static int getIntervalYears(Date beginDate, Date endDate){
+        calendar.setTime(beginDate);
+        int beginYear = calendar.get(Calendar.YEAR);
+        calendar.setTime(endDate);
+        int endYear = calendar.get(Calendar.YEAR);
+        return endYear - beginYear;
+    }
+
 
     /**
      * @param beginDate 开始日期
@@ -349,13 +363,24 @@ public class DateTools {
 //        System.out.println(format(getLastDayByMonth(new Date())));
 //        System.out.println(new Date().toString());
 
-        System.out.println("-----------------");
-        System.out.println(format(date, PATTERN_HYPHEN_YMD_HMS));
-        System.out.println(format(date, PATTERN_HYPHEN_YMD));
-        System.out.println(format(date, PATTERN_SLASH_YMD_HMS));
-        System.out.println(format(date, PATTERN_SLASH_YMD));
-        System.out.println(format(date, PATTERN_NUM_YMD_HMS));
-        System.out.println(format(date, PATTERN_NUM_YMD));
+//        System.out.println("-----------------");
+//        System.out.println(format(date, PATTERN_HYPHEN_YMD_HMS));
+//        System.out.println(format(date, PATTERN_HYPHEN_YMD));
+//        System.out.println(format(date, PATTERN_SLASH_YMD_HMS));
+//        System.out.println(format(date, PATTERN_SLASH_YMD));
+//        System.out.println(format(date, PATTERN_NUM_YMD_HMS));
+//        System.out.println(format(date, PATTERN_NUM_YMD));
+
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_HYPHEN_YMD);
+        String thatDateStr =    "2019-01-01";
+        String beginDateStr =   "2010-01-01";
+        String endDateStr =     "2019-01-01";
+        Date thatDate = sdf.parse(thatDateStr);
+        Date beginDate = sdf.parse(beginDateStr);
+        Date endDate = sdf.parse(endDateStr);
+        System.out.println(getIntervalYears(beginDate, endDate));
 
     }
 

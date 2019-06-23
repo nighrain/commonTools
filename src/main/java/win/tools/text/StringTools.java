@@ -13,7 +13,15 @@ import java.util.ArrayList;
  *  
  */
 public class StringTools {
+    public static void main(String[] args) {
+        System.out.println(isEmpty(null));
+        System.out.println(isEmpty(" "));
+        System.out.println(isEmpty("1 "));
+    }
 
+    public static boolean isEmpty(String str){
+        return (str == null || "".equals(str.trim()));
+    }
 
     /**
      * @param str abcDef => ABC_DEF

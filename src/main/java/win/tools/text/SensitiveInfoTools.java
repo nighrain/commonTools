@@ -12,7 +12,9 @@ package win.tools.text;
  */
 public class SensitiveInfoTools {
 
-    private SensitiveInfoTools() {}
+    private SensitiveInfoTools() {
+        throw new UnsupportedOperationException("u can't instantiate me...");
+    }
 
     /**
      * @param srcStr
