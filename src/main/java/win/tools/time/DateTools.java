@@ -374,13 +374,16 @@ public class DateTools {
 
 
         SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_HYPHEN_YMD);
-        String thatDateStr =    "2019-01-01";
-        String beginDateStr =   "2010-01-01";
-        String endDateStr =     "2019-01-01";
-        Date thatDate = sdf.parse(thatDateStr);
-        Date beginDate = sdf.parse(beginDateStr);
-        Date endDate = sdf.parse(endDateStr);
-        System.out.println(getIntervalYears(beginDate, endDate));
+//        String thatDateStr =    "2019-01-01";
+//        String beginDateStr =   "2010-01-01";
+//        String endDateStr =     "2019-01-01";
+//        Date thatDate = sdf.parse(thatDateStr);
+//        Date beginDate = sdf.parse(beginDateStr);
+//        Date endDate = sdf.parse(endDateStr);
+//        System.out.println(getIntervalYears(beginDate, endDate));
+
+        Date parse = sdf.parse("1900-01-01");
+        System.out.println(parse.getTime());
 
     }
 

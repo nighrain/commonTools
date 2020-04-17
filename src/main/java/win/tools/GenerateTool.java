@@ -14,10 +14,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -498,9 +495,9 @@ public class GenerateTool {
      */
     private static StringBuffer doGenerateSql(StringBuffer sbSql, String javaType, String field, String oracleType) {
         if ("-1".equals(javaType) || "e".equals(javaType)) {        //已自动解析
-            sbSql.append(",\r\n" + StringTools.hump2Underline(field) + " \t " + oracleType);
+            sbSql.append(",\r\n" + StringTools.toFixedLength(24,StringTools.hump2Underline(field)) + "\t " + oracleType);
         } else {                                                    //无法自动解析
-            sbSql.append(",\r\n" + StringTools.hump2Underline(field) + " \t " + oracleType + " XXX手动处理该字段");
+            sbSql.append(",\r\n" + StringTools.toFixedLength(24,StringTools.hump2Underline(field)) + "\t " + oracleType + " XXX手动处理该字段");
         }
         return sbSql;
     }

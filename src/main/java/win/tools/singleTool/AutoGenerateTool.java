@@ -14,10 +14,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -25,19 +22,31 @@ import java.util.Map;
  * Title         [解析工具类,独立版]
  * Author:       [nighrain]
  * CreateDate:   [2019-06-22--08:59]
- * Version:      [v1.0]
+ * Version:      [v1.4]
  * Description:  [解析class生成getter/setter方法和oracle-sql语句]
  * <p>
  *     注意: 多表关联的无法自动解析,需要在解析完成后手动处理多表关系
+ *
+ *     <history>
+ *          1.0: 完成基本功能;
+ *          1.1: 增加枚举识别 枚举类型的VARCHAR2长度, 非基本对象的提示, 描述类字段和一般字符串的长度分离;
+ *          1.2: 增加输出到文件, 增加信息统计;
+ *          1.3: 增加自定义识别描述了字段的规则, 提取参数,增加参数配置方法 init;
+ *          1.4: 增加sql美化;
+ *     </history>
  * </p>
  *  
  */
 public class AutoGenerateTool {
 
     public static void main(String[] args) {
-        //输出文件夹
+        //System.out.println(System.getProperty("user.dir"));
+        System.out.println(Thread.currentThread().getContextClassLoader().getResource("").getPath());
+
+
+        //输出文件夹 非必须
         AutoGenerateTool.initPath("D:\\.autoGetSet");
-        //初始化 VARCHAR2 参数
+        //初始化 VARCHAR2 参数 非必须
         AutoGenerateTool.init(32, 64, 128);
 
         /**
@@ -310,11 +319,24 @@ public class AutoGenerateTool {
      */
     private static StringBuffer doGenerateSql(StringBuffer sbSql, String javaType, String field, String oracleType) {
         if ("-1".equals(javaType) || "e".equals(javaType)) {        //已自动解析
-            sbSql.append(",\r\n" + hump2Underline(field) + " \t " + oracleType);
+            sbSql.append(",\r\n" + toFixedLength(24,hump2Underline(field)) + "\t " + oracleType);
         } else {                                                    //无法自动解析
-            sbSql.append(",\r\n" + hump2Underline(field) + " \t " + oracleType + " XXX手动处理该字段");
+            sbSql.append(",\r\n" + toFixedLength(24,hump2Underline(field)) + "\t " + oracleType + " XXX手动处理该字段");
         }
         return sbSql;
+    }
+
+    /**
+     * @param len 定长
+     * @param input 输入的字符串
+     * @return 给输入的字符串拼接空格成定长
+     */
+    private static String toFixedLength(int len, String input){
+        if(input.length() >= len) return input;
+        int sub = len - input.length();
+        char[] chars = new char[sub];
+        Arrays.fill(chars, ' ');
+        return input + new String(chars);
     }
 
     /**
@@ -345,6 +367,9 @@ public class AutoGenerateTool {
      * @param fileName 文件名称
      */
     public static void output2File(StringBuffer date,String parentPath, String fileName) {
+
+//        parentPath = System.getProperty("user.dir")+File.separator+"dmposReuse"+File.separator+".autoGetSet";
+
 
         //创建文件夹
         File parentDir = new File(parentPath);

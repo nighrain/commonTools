@@ -81,4 +81,12 @@ public class FileTools {
         }
         System.out.println("解析结果已输出到: "+file.getPath());
     }
+
+    public static void mkdirs(String parentPath){
+        //创建文件夹
+        File parentDir = new File(parentPath);
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+    }
 }

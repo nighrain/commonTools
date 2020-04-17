@@ -1,6 +1,7 @@
 package win.tools.text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *    
@@ -17,6 +18,19 @@ public class StringTools {
         System.out.println(isEmpty(null));
         System.out.println(isEmpty(" "));
         System.out.println(isEmpty("1 "));
+    }
+
+    /**
+     * @param len 定长
+     * @param input 输入的字符串
+     * @return 给输入的字符串拼接空格成定长
+     */
+    public static String toFixedLength(int len, String input){
+        if(input.length() >= len) return input;
+        int sub = len - input.length();
+        char[] chars = new char[sub];
+        Arrays.fill(chars, ' ');
+        return input + new String(chars);
     }
 
     public static boolean isEmpty(String str){
